@@ -100,7 +100,6 @@ class PluginManager():
             logging.error("Could not read plugin conf file!")
             return
         data = [nsplit(x, 3) for x in data.splitlines() if not x.startswith("#")]
-        print(data)
         for path, mode, settings in [x for x in data if x[1] ]:
             self.load_plugin(path, mode, settings)
 
@@ -128,7 +127,6 @@ class PluginManager():
                     piped = None
             nick, ident, host = user_split(user)
             logging.debug("Parsing command %s"%command)
-            print(self.hooks['commands'])
             plug = self.hooks['commands'].get(command)
             if plug:
                 logging.debug("Performing command %s (plugin %s)"%(command, plug.name))
