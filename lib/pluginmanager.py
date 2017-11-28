@@ -100,6 +100,7 @@ class PluginManager():
             logging.error("Could not read plugin conf file!")
             return
         data = [nsplit(x, 3) for x in data.splitlines() if not x.startswith("#")]
+        print(data)
         for path, mode, settings in [x for x in data if x[1] ]:
             self.load_plugin(path, mode, settings)
 
@@ -115,14 +116,19 @@ class PluginManager():
 
     def exec_if_command(self, command, args, user, channel):
         try:
-            piped = [x.strip() for x in PIPEREGEX.split(args)]
-            if len(piped) > 1: # pipes were found
-                args  = piped[0]
-                piped = piped[1:]
-            else:
+            try:
+                piped = [x.strip() for x in PIPEREGEX.split(args)]
+            except TypeError: # No args.
                 piped = None
+            else:
+                if len(piped) > 1: # pipes were found
+                    args  = piped[0]
+                    piped = piped[1:]
+                else:
+                    piped = None
             nick, ident, host = user_split(user)
             logging.debug("Parsing command %s"%command)
+            print(self.hooks['commands'])
             plug = self.hooks['commands'].get(command)
             if plug:
                 logging.debug("Performing command %s (plugin %s)"%(command, plug.name))
