@@ -1,5 +1,6 @@
 import urllib.request
 import urllib.parse
+import logging
 
 
 class WolframAlpha():
@@ -9,7 +10,6 @@ class WolframAlpha():
     commands = ['w', 'wa']
 
     def _apiFetch(self, userInput):
-        # args = urllib.parse.quote(userInput)
         apiRequest = urllib.request.Request(
             self.api.format(input, self.appId))
         try:
@@ -17,15 +17,23 @@ class WolframAlpha():
         except urllib.error.URLError:
             return False
         else:
-            return apiResonse
+            if "Appid missing" in str(apiResonse):
+                logging.error("The WolframAlpha plugin requires a valid AppId.")
+                return False
+            else:
+                return apiResonse
 
     def command(self, bot=None, command=None, arguments=None,
                 nick=None, channel=None, ident=None, host=None):
-        apiData = self._apiFetch(arguments)
-        if(apiData):
-            print("yes")
+        if not arguments:
+            bot.say(channel, "Incorrect usage. '{} <value>''".format(command))
         else:
-            print("API not available.")
+            args = ''.join(arguments)
+            apiData = self._apiFetch(arguments)
+            if apiData == False:
+                bot.say(channel, "Error, please look at the console.")
+            else:
+                print(apiData)
 
     def loadSettings(self, settings, **args):
         self.api = settings['api']
